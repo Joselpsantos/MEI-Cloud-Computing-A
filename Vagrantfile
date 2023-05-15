@@ -4,12 +4,12 @@
 Vagrant.configure("2") do |config|
 
   config.vm.define "ansible" do |ansible|
-    ansible.vm.box = "bento/centos-7"
-    ansible.vm.hostname = "ansible-server"
-    ansible.vm.network "private_network", ip: '192.168.33.10'
+    ansible.vm.box = "generic/centos9s"
+    ansible.vm.hostname = "ansible-srv"
+    ansible.vm.network "private_network", ip: '192.168.33.50'
 
     ansible.vm.provider "virtualbox" do |v|
-      v.name = "Ansible-Server"
+      v.name = "Ansible-srv"
       v.memory = 1024
      # v.linked_clone = true
     end
@@ -23,9 +23,9 @@ Vagrant.configure("2") do |config|
   end
 
   config.vm.define "lb01" do |lb01|
-    lb01.vm.box = "bento/ubuntu-22.04"
+    lb01.vm.box = "generic/ubuntu2204"
     lb01.vm.hostname = "lb01"
-    lb01.vm.network "private_network", ip: '192.168.33.15'
+    lb01.vm.network "private_network", ip: '192.168.33.51'
 
     lb01.vm.provider "virtualbox" do |v|
       v.name = "Ansible-lb01"
@@ -36,29 +36,29 @@ Vagrant.configure("2") do |config|
   end
 
   config.vm.define "web01" do |web01|
-    web01.vm.box = "bento/ubuntu-22.04"
+    web01.vm.box = "generic/ubuntu2204"
     web01.vm.hostname = "web01"
-    web01.vm.network "private_network", ip: '192.168.33.20'
+    web01.vm.network "private_network", ip: '192.168.33.52'
 
     web01.vm.provider "virtualbox" do |v|
       v.name = "Ansible-web01"
-      v.memory = 512
+      v.memory = 1024
       # v.linked_clone = true
     end
     web01.vm.synced_folder '.', '/vagrant', disabled: true
   end
 
-  config.vm.define "web023" do |web023|
-    web023.vm.box = "bento/ubuntu-22.04"
-    web023.vm.hostname = "web023"
-    web023.vm.network "private_network", ip: '192.168.33.30'
+  config.vm.define "web02" do |web02|
+    web02.vm.box = "generic/ubuntu2204"
+    web02.vm.hostname = "web02"
+    web02.vm.network "private_network", ip: '192.168.33.53'
 
-    web023.vm.provider "virtualbox" do |v|
-      v.name = "Ansible-web023"
-      v.memory = 512
+    web02.vm.provider "virtualbox" do |v|
+      v.name = "Ansible-web02"
+      v.memory = 1024
       # v.linked_clone = true
     end
-    web023.vm.synced_folder '.', '/vagrant', disabled: true
+    web02.vm.synced_folder '.', '/vagrant', disabled: true
   end
 
 end

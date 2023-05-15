@@ -1,0 +1,7 @@
+lb01 ansible_host=192.168.33.51
+web01 ansible_host=192.168.33.52
+web02 ansible_host=192.168.33.53
+
+[nginx_vms]
+web01
+web02
