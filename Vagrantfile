@@ -29,7 +29,7 @@ Vagrant.configure("2") do |config|
 
     lb01.vm.provider "virtualbox" do |v|
       v.name = "Ansible-lb01"
-      v.memory = 512
+      v.memory = 1024
      # v.linked_clone = true
     end
     lb01.vm.synced_folder '.', '/vagrant', disabled: true
@@ -45,6 +45,10 @@ Vagrant.configure("2") do |config|
       v.memory = 1024
       # v.linked_clone = true
     end
+    web01.vm.provision "shell", path: "provision.sh"
+    web01.vm.provision "shell", privileged: false, inline: <<-SHELL
+    sudo echo "This is web01" > /var/www/html/index.html
+    SHELL
     web01.vm.synced_folder '.', '/vagrant', disabled: true
   end
 
@@ -58,6 +62,10 @@ Vagrant.configure("2") do |config|
       v.memory = 1024
       # v.linked_clone = true
     end
+    web02.vm.provision "shell", path: "provision.sh"
+    web02.vm.provision "shell", privileged: false, inline: <<-SHELL
+    sudo echo "This is web02" > /var/www/html/index.html
+    SHELL
     web02.vm.synced_folder '.', '/vagrant', disabled: true
   end
 

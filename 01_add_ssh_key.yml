@@ -1,6 +1,6 @@
 ---
 - name: Copy SSH public key to remote node
-  hosts: nginx_vms
+  hosts: lb01
   become: true
   tasks:
     - name: Copy SSH public key to remote node

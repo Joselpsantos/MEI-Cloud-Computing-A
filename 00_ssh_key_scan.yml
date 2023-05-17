@@ -1,6 +1,6 @@
 ---
 - name: Add hosts to known_hosts
-  hosts: nginx_vms
+  hosts: lb01
   gather_facts: no
   tasks:
   - name: run ssh-keyscan to add keys to known_hosts
