@@ -5,3 +5,8 @@ web02 ansible_host=192.168.33.53
 [nginx_vms]
 web01
 web02
+
+[all_nodes]
+lb01
+web01
+web02

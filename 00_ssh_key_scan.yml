@@ -1,6 +1,6 @@
 ---
 - name: Add hosts to known_hosts
-  hosts: lb01
+  hosts: all_nodes
   gather_facts: no
   tasks:
   - name: run ssh-keyscan to add keys to known_hosts

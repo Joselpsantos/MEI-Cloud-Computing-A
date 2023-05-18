@@ -11,3 +11,9 @@
         src: "{{ app_root }}"
         dest: "{{ document_root }}"
         mode: preserve
+
+    - name: Copy default.conf file of NGINX
+      copy:
+        src: /files/default
+        dest: /etc/nginx/sites-enabled/
+        mode: preserve

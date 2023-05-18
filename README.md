@@ -33,7 +33,7 @@ Abstract:xxx
   ```
   ansible-playbook -i hosts example_1/add_ssh_key.yml --ask-pass
   ```
-- Install NGINX:
+- Install NGINX in LB01:
   ```
   ansible-playbook -i hosts example_02_installnginx.yml
   ```

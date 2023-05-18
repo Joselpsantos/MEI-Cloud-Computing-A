@@ -1,6 +1,6 @@
 ---
 - name: Copy SSH public key to remote node
-  hosts: lb01
+  hosts: all_nodes
   become: true
   tasks:
     - name: Copy SSH public key to remote node
