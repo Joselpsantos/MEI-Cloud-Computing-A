@@ -134,15 +134,9 @@ Open in browser this address.<br>
 
 - See logs
   ```
-  OS: Debian unstable (May 2021), Ubuntu LTS
-  Python: 3.8.5 (anaconda)
-  PyTorch: 1.7.1, 1.8.1
+  tail -n /var/log/nginx/access.log
   ```
-- hardware
-  ```
-  CPU: Intel Xeon 6226R
-  GPU: Nvidia RTX3090 (24GB)
-  ```
+
 ## Issues
 - Error: Failed to provision box: Vagrant was unable to mount VirtualBox shared folders. This is usually
 because the filesystem "vboxsf" is not available
