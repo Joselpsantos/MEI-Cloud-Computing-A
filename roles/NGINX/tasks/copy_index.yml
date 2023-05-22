@@ -1,0 +1,8 @@
+- name: Copy website files to the server's document root
+  hosts: nginx_vms
+  tasks:
+    - name: Copy files
+      template:
+        src: index.html.j2
+        dest: /var/www/html/index.html
+        mode: preserve

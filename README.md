@@ -1,17 +1,33 @@
 Title
 ===
-Abstract:xxx
-## Papar Information
-- Title:  `paper name`
-- Authors:  `A`,`B`,`C`
-- Preprint: [https://arxiv.org/abs/xx]()
-- Full-preprint: [paper position]()
-- Video: [video position]()
+Two Web Servers, ansible and load balancer.
+## Goals
+Tasks – Replicate TP class examples
+1. Create a 3 node Vagrant setup (lb01, web01, web02) using Ubuntu 22.04
+1. Install nginx on the 3 nodes
+2. Setup the two web servers to serve a simple HTML page (“Hello, web01”, “Hello, web02”)
+3. Setup the remaining node (lb01) to serve as a load balancer to web01 and web02
+4. Test that the basic setup is working
+5. Test all the balance methods
+1. Q: What is the purpose of each one? (Pros / cons)
+2. Q: What would happen with JSON Web Tokens? What about traditional sessions and cookies?
+6. Check the access logs across nodes, what is the problem?
+1. Customize logs and headers to make it more useful
+7. Set a weight of 3 to node web01 and verify the result
+8. Configure static assets such as jpg images to always be served by web02
+9. What happens to requests if one web node is down?
+1. What happens when it gets back up?
+<br><b>Challenge: automate provisioning with Ansible and create playbooks + templates to test each step</b>
 
+• Tasks – Additional challenge
+1. Setup a load balancer in front of your small app (2 nodes of simple php
+script querying a table in a 3rd node with the DB )
+1. Create two endpoints (or php files): 1) cpu intensive task; 2) db intensive task
+2. Use vegeta to assess performance when using one versus two php nodes
 ## Install & Dependence
-- python
-- pytorch
-- numpy
+- VirtualBox
+- (Space in disk)
+- Browser
 
 
 ## Use
@@ -27,16 +43,20 @@ Abstract:xxx
 - Keyscan:
   <br>Add the fingerprints of our target hosts to the ~/.ssh/known_hosts of our control node:
   ```
-  ansible-playbook -i hosts example_0/ssh_key_scan.yml -v
+  ansible-playbook -i hosts 00_ssh_key_scan.yml -v
   ```
 - Copy SSH key:
   ```
-  ansible-playbook -i hosts example_1/add_ssh_key.yml --ask-pass
+  ansible-playbook -i hosts 01_add_ssh_key.yml --ask-pass
   ```
 - Install NGINX in LB01:
   ```
-  ansible-playbook -i hosts example_02_installnginx.yml
+  ansible-playbook -i hosts 02_installnginx.yml
   ```
+- See in action:<br>
+Open in browser this address.<br>
+  [http://192.168.33.51]()
+  
 
 
 ## Directory Hierarchy
@@ -105,8 +125,14 @@ Abstract:xxx
 |—— Vagrantfile
 ```
 ## Code Details
-### Tested Platform
-- software
+### Load Balancer
+- Change config NGINX
+  ```
+  cd /etc/nginx
+  sudo nano nginx.conf
+  ```
+
+- See logs
   ```
   OS: Debian unstable (May 2021), Ubuntu LTS
   Python: 3.8.5 (anaconda)
@@ -117,18 +143,14 @@ Abstract:xxx
   CPU: Intel Xeon 6226R
   GPU: Nvidia RTX3090 (24GB)
   ```
-### Hyper parameters
-```
-```
+## Issues
+- Error: Failed to provision box: Vagrant was unable to mount VirtualBox shared folders. This is usually
+because the filesystem "vboxsf" is not available
+  ```
+  vagrant plugin install vagrant-vbguest
+  vagrant <node> reload
+  ```
 ## References
-- [paper-1]()
-- [paper-2]()
-- [code-1](https://github.com)
-- [code-2](https://github.com)
-  
-## License
 
-## Citing
-If you use xxx,please use the following BibTeX entry.
-```
-```
+- [NGINX](https://docs.nginx.com/)
+  
