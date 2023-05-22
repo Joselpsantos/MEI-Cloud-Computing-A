@@ -38,7 +38,7 @@ script querying a table in a 3rd node with the DB )
 - Enter SSH:
   ```
   vagrant ssh ansible
-  cd /vagrant/ansible
+  cd /vagrant
   ```
 - Keyscan:
   <br>Add the fingerprints of our target hosts to the ~/.ssh/known_hosts of our control node:
@@ -135,6 +135,14 @@ Open in browser this address.<br>
 - See logs
   ```
   tail -n /var/log/nginx/access.log
+  ```
+- Restart Load balance
+  ```
+  sudo systemctl restart nginx
+  ```
+- Test config file of Load balance
+  ```
+  sudo /usr/sbin/nginx -t
   ```
 
 ## Issues

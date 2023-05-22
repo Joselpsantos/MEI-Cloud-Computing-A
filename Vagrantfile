@@ -47,7 +47,7 @@ Vagrant.configure("2") do |config|
     end
     web01.vm.provision "shell", path: "provision.sh"
     web01.vm.provision "shell", privileged: false, inline: <<-SHELL
-    sudo echo "This is web01" > /var/www/html/index.html
+    sudo bash -c 'echo "This is web01" > /var/www/html/index.html'
     SHELL
     web01.vm.synced_folder '.', '/vagrant', disabled: true
   end
@@ -64,7 +64,7 @@ Vagrant.configure("2") do |config|
     end
     web02.vm.provision "shell", path: "provision.sh"
     web02.vm.provision "shell", privileged: false, inline: <<-SHELL
-    sudo echo "This is web02" > /var/www/html/index.html
+    sudo bash -c 'echo "This is web02" > /var/www/html/index.html'
     SHELL
     web02.vm.synced_folder '.', '/vagrant', disabled: true
   end

@@ -14,6 +14,6 @@
 
     - name: Copy default.conf file of NGINX
       copy:
-        src: /files/default
+        src: files/default
         dest: /etc/nginx/sites-enabled/
         mode: preserve
