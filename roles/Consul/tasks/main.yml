@@ -1,0 +1,51 @@
+---
+    - name: Install unzip
+      apt:
+        name: unzip
+        state: present
+
+    - name: Download Consul
+      get_url:
+        url: "https://releases.hashicorp.com/consul/1.15.2/consul_1.15.2_linux_amd64.zip"
+        dest: /tmp/consul.zip
+
+    - name: Extract Consul
+      unarchive:
+        src: /tmp/consul.zip
+        dest: /usr/local/bin
+        remote_src: yes
+        extra_opts: [--strip-components=1]
+
+    - name: Set Consul permissions
+      file:
+        path: /usr/local/bin/consul
+        owner: root
+        group: root
+        mode: "0755"
+
+    - name: Create Consul configuration directory
+      file:
+        path: /etc/consul.d
+        state: directory
+
+    - name: Copy Consul configuration
+      copy:
+        src: files/consul.hcl
+        dest: /etc/consul.d/consul.hcl
+
+    - name: Create /var/log/consul directory
+      file:
+        path: /var/log/consul
+        state: directory
+        mode: '0777'
+
+    - name: Start Consul service
+      systemd:
+        name: consul
+        state: started
+        enabled: yes
+
+    - name: Install firewalld
+      apt:
+        name: firewalld
+        state: present

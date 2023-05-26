@@ -1,6 +1,8 @@
 lb01 ansible_host=192.168.33.51
 web01 ansible_host=192.168.33.52
 web02 ansible_host=192.168.33.53
+master ansible_host=192.168.33.10
+replica ansible_host=192.168.33.20
 
 [nginx_vms]
 web01
@@ -10,3 +12,9 @@ web02
 lb01
 web01
 web02
+master
+replica
+
+[postgresql_servers]
+master
+replica

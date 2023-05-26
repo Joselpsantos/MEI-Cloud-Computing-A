@@ -144,7 +144,21 @@ Open in browser this address.<br>
   ```
   sudo /usr/sbin/nginx -t
   ```
+## Consul
+- Install consul
+  ```
+  ansible-playbook -i hosts 03_install_consul.yml
+  ```
 
+-  See log file (in consul server)
+    ```
+    sudo journalctl -u consul
+    ```
+
+-  See status service (in consul server)
+    ```
+    sudo systemctl status consul
+    ```
 ## Issues
 - Error: Failed to provision box: Vagrant was unable to mount VirtualBox shared folders. This is usually
 because the filesystem "vboxsf" is not available

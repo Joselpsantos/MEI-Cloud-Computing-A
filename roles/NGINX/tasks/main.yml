@@ -5,7 +5,6 @@
         state: latest
         update_cache: yes
     
-
     - name: Copy website files to the server's document root
       copy:
         src: "{{ app_root }}"
@@ -17,3 +16,9 @@
         src: files/default
         dest: /etc/nginx/sites-enabled/
         mode: preserve
+    
+    - name: Restart Nginx service
+      become: true
+      systemd:
+        name: nginx
+        state: restarted

@@ -1,0 +1,6 @@
+---
+- name: Install postgreSQL
+  hosts: postgresql_servers # escolher o(s) node(s) para o PostgreSQL
+  become: true
+  roles:
+    - /vagrant/roles/postgreSQL # install PostgreSQL

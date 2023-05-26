@@ -69,4 +69,34 @@ Vagrant.configure("2") do |config|
     web02.vm.synced_folder '.', '/vagrant', disabled: true
   end
 
+  config.vm.define "master" do |master|
+    master.vm.box = "generic/ubuntu2204"
+    master.vm.hostname = "master"
+    master.vm.network "private_network", ip: "192.168.33.10"
+    master.vm.provider "virtualbox" do |vb|
+      vb.name = "postgresql-master"
+      vb.memory = "1024"
+    end
+    master.vm.provision "shell", inline: <<-SHELL
+      sudo apt-get update
+      sudo apt-get install -y postgresql postgresql-contrib
+      # Configure master PostgreSQL settings here
+    SHELL
+  end
+
+  config.vm.define "replica" do |replica|
+    replica.vm.box = "generic/ubuntu2204"
+    replica.vm.hostname = "replica"
+    replica.vm.network "private_network", ip: "192.168.33.20"
+    replica.vm.provider "virtualbox" do |vb|
+      vb.name = "postgresql-replica"
+      vb.memory = "1024"
+    end
+    replica.vm.provision "shell", inline: <<-SHELL
+      sudo apt-get update
+      sudo apt-get install -y postgresql postgresql-contrib
+      # Configure replica PostgreSQL settings here
+    SHELL
+  end
+
 end
