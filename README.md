@@ -55,7 +55,7 @@ script querying a table in a 3rd node with the DB )
   ```
 - See in action:<br>
 Open in browser this address.<br>
-  [http://192.168.33.51]()
+  [http://192.168.33.51](http://192.168.33.51)
   
 
 
@@ -148,6 +148,7 @@ Open in browser this address.<br>
 - Install consul
   ```
   ansible-playbook -i hosts 03_install_consul.yml
+  (in test) ansible-playbook -i hosts 03_install_consul.yml --tags consul -vv -K
   ```
 
 -  See log file (in consul server)
@@ -169,4 +170,6 @@ because the filesystem "vboxsf" is not available
 ## References
 
 - [NGINX](https://docs.nginx.com/)
-  
+
+ consul key: 
+Ult9Gn8qAqbXoWlJvOXMc/Es+GRJHxl1b8sYQR5i8n4=

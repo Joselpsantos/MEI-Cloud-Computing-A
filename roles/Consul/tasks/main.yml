@@ -1,51 +1,89 @@
 ---
-    - name: Install unzip
+    - name: Update the software package repository
       apt:
-        name: unzip
-        state: present
+        update_cache: yes
 
-    - name: Download Consul
-      get_url:
-        url: "https://releases.hashicorp.com/consul/1.15.2/consul_1.15.2_linux_amd64.zip"
-        dest: /tmp/consul.zip
+    - name: Install dependencies
+      package:
+        name: "{{ item }}"
+        state: latest
+      with_items:
+        - curl
+        - net-tools
+        - unzip
 
-    - name: Extract Consul
+    - name: Install consul
       unarchive:
-        src: /tmp/consul.zip
+        src: https://releases.hashicorp.com/consul/1.1.0/consul_1.1.0_linux_amd64.zip
         dest: /usr/local/bin
         remote_src: yes
-        extra_opts: [--strip-components=1]
 
-    - name: Set Consul permissions
-      file:
-        path: /usr/local/bin/consul
-        owner: root
-        group: root
-        mode: "0755"
+    - name: Verify consul installation
+      shell: "consul --version"
+      register: consul_version
 
-    - name: Create Consul configuration directory
+    - assert:
+        that:
+          - "'Consul' in consul_version.stdout"
+
+    - name: Create consul user
+      user:
+        name: consul
+
+    - name: Create Consul /var directory
       file:
-        path: /etc/consul.d
+        path: /var/consul
         state: directory
+        owner: consul
+        group: consul
+        mode: 0755
 
     - name: Copy Consul configuration
       copy:
         src: files/consul.hcl
         dest: /etc/consul.d/consul.hcl
+        mode: "0644"
+    
+    - name: Copy Consul systemd service file
+      copy:
+        src: files/consul.service
+        dest: /etc/systemd/system/consul.service
+        mode: "0644"
 
-    - name: Create /var/log/consul directory
-      file:
-        path: /var/log/consul
-        state: directory
-        mode: '0777'
+    - name: Copy server.hcl file
+      become: true
+      copy:
+        src: files/server.hcl
+        dest: /etc/consul.d/server.hcl
+        owner: consul
+        group: consul
+        mode: "0640"
 
-    - name: Start Consul service
+    - name: Enable and start Consul service
       systemd:
         name: consul
         state: started
-        enabled: yes
+        enabled: true
 
-    - name: Install firewalld
-      apt:
-        name: firewalld
-        state: present
+    - name: Create Consul bootstrap directory
+      file:
+        path: /etc/consul.d/bootstrap
+        state: directory
+        mode: '0755'
+
+    - name: Copy configuration file
+      copy:
+        src: /files/bootstrap-config.json
+        dest: /etc/consul.d/bootstrap/config.json
+
+    - name: Copy systemd bootstrap consul.service
+      copy:
+        src: /files/bootstrap-consul.service
+        dest: /etc/systemd/system/consul.service
+
+    - name: Start bootstrap Consul
+      systemd:
+        name: consul.service
+        state: started
+
+

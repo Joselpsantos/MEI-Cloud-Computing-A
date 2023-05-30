@@ -99,4 +99,17 @@ Vagrant.configure("2") do |config|
     SHELL
   end
 
+  config.vm.define "consul" do |consul|
+    consul.vm.box = "generic/ubuntu2204"
+    consul.vm.hostname = "consul"
+    consul.vm.network "private_network", ip: '192.168.33.54'
+
+    consul.vm.provider "virtualbox" do |v|
+      v.name = "Ansible-consul"
+      v.memory = 1024
+      # v.linked_clone = true
+    end
+    consul.vm.synced_folder '.', '/vagrant', disabled: true
+  end
+
 end

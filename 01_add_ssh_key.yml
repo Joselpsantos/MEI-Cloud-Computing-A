@@ -1,6 +1,6 @@
 ---
 - name: Copy SSH public key to remote node
-  hosts: all_nodes
+  hosts: master replica
   become: true
   tasks:
     - name: Copy SSH public key to remote node

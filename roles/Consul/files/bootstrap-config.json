@@ -1,0 +1,11 @@
+{
+    "bootstrap": true,
+    "client_addr": "0.0.0.0",
+    "server": true,
+    "datacenter": "chennai",
+    "data_dir": "/var/consul",
+    "encrypt": "PfCkrq/lFPem7slKP5N2Cw==",
+    "log_level": "INFO",
+    "enable_syslog": true
+  }
+  
