@@ -24,6 +24,8 @@ Abstract:xxx
 | dataset-C | [download]() |
 
 ## Use
+
+![image](https://github.com/Joselpsantos/MEI-System/assets/113514374/238c6258-b835-4e38-83d4-d57d59b6ad11)
 - for train
   ```
   python train.py
@@ -32,6 +34,7 @@ Abstract:xxx
   ```
   python test.py
   ```
+  ![image](https://github.com/Joselpsantos/MEI-System/assets/113514374/af8b3a6a-3663-413e-89e0-82a288488aa7)
 
 ## Directory Hierarchy
 ```
