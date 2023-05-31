@@ -3,17 +3,20 @@ Title
 Abstract:xxx
 ## Papar Information
 - Title:  `paper name`
-- Authors:  `A`,`B`,`C`
+- Authors:  José Santos and Rui Paiva
 - Preprint: [https://arxiv.org/abs/xx]()
 - Full-preprint: [paper position]()
 - Video: [video position]()
 
 ## Install & Dependence
-- python
-- pytorch
-- numpy
+- Virtual Box
+- Vagrant
+- Ansible
+- Python
+- Broker MQTT
+- MongoDB
 
-## Dataset Preparation
+## Raspberry Pico W
 | Dataset | Download |
 | ---     | ---   |
 | dataset-A | [download]() |
@@ -29,13 +32,6 @@ Abstract:xxx
   ```
   python test.py
   ```
-## Pretrained model
-| Model | Download |
-| ---     | ---   |
-| Model-1 | [download]() |
-| Model-2 | [download]() |
-| Model-3 | [download]() |
-
 
 ## Directory Hierarchy
 ```
@@ -62,9 +58,4 @@ Abstract:xxx
 - [code-1](https://github.com)
 - [code-2](https://github.com)
   
-## License
 
-## Citing
-If you use xxx,please use the following BibTeX entry.
-```
-```
