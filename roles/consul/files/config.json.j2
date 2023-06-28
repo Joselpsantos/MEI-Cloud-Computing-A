@@ -1,0 +1,11 @@
+{
+    "datacenter": "dc1",
+    "bind_addr": "{{hostvars[inventory_hostname]['ansible_eth1']['ipv4']['address'] }}",
+    "node_name": "{{ ansible_hostname }}",
+    "data_dir": "/var/lib/consul",
+    "encrypt": "UKteYxkHsRYraAfZULrS8ZddQCI59QLbyOdONWOFQf4=",
+    "ui":true,
+    "retry_join":["192.168.44.70"],
+    "log_level":"INFO",
+    "enable_script_checks": true
+}

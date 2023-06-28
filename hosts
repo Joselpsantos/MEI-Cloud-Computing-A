@@ -1,20 +1,24 @@
-lb01 ansible_host=192.168.33.51
-web01 ansible_host=192.168.33.52
-web02 ansible_host=192.168.33.53
-master ansible_host=192.168.33.10
-replica ansible_host=192.168.33.20
+lb01 ansible_host=192.168.44.25
+webapp1 ansible_host=192.168.44.10
+webapp2 ansible_host=192.168.44.11
+sockets ansible_host=192.168.44.15
+consul ansible_host=192.168.44.70
 
-[nginx_vms]
-web01
-web02
+[web_servers]
+webapp1
+webapp2
+
+[consul_server]
+consul
 
 [all_nodes]
 lb01
-web01
-web02
-master
-replica
+webapp1
+webapp2
+sockets
+consul
 
-[postgresql_servers]
-master
-replica
+[web_lb]
+lb01
+webapp1
+webapp2

@@ -1,0 +1,11 @@
+- name: Install Consul on clients
+  hosts: all_nodes
+  become: true
+  roles:
+    - /vagrant/roles/consul 
+
+- name: Define web services
+  hosts: all_nodes
+  become: true
+  roles:
+    - /vagrant/roles/consul-services

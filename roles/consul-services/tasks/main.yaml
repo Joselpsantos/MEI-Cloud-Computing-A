@@ -1,0 +1,35 @@
+---
+    - name: Copy service file (Web servers)
+      copy:
+        src: files/web.json
+        dest: /etc/consul.d
+      when: inventory_hostname in ['webapp1', 'webapp2']
+
+    #- name: Copy configuration file (Load Balancer)
+    #  copy:
+    #    src: files/consul-template-config.hcl
+    #    dest: /etc/consul.d/
+    #  when: inventory_hostname == 'lb01'
+
+    - name: Copy sevice file (Load Balancer)
+      copy:
+        src: files/load-balancer.json
+        dest: /etc/consul.d/
+      when: inventory_hostname == 'lb01'
+
+    - name: Copy sevice file (sockets)
+      copy: 
+        src: files/sockets.json
+        dest: /etc/consul.d/
+      when: inventory_hostname == 'sockets'
+
+    - name: Copy sevice file (sockets)
+      shell: cd /vagrant/ws/ && php websockets_server.php
+      async: 20
+      poll: 0 
+      when: inventory_hostname == 'sockets'
+
+    - name: Restart Consul
+      service:
+        name: consul
+        state: restarted

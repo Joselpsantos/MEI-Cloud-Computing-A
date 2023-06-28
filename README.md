@@ -6,35 +6,44 @@ Abstract:xxx
 - Authors:  José Santos and Rui Paiva
 - Preprint: [https://arxiv.org/abs/xx]()
 - Full-preprint: [paper position]()
-- Video: [video position]()
+- 
+![image](https://github.com/Joselpsantos/MEI-System/assets/113514374/238c6258-b835-4e38-83d4-d57d59b6ad11)
 
 ## Install & Dependence
 - Virtual Box
 - Vagrant
 - Ansible
-- Python
-- Broker MQTT
-- MongoDB
 
-## Raspberry Pico W
-| Dataset | Download |
-| ---     | ---   |
-| dataset-A | [download]() |
-| dataset-B | [download]() |
-| dataset-C | [download]() |
+## How to use
 
-## Use
 
-![image](https://github.com/Joselpsantos/MEI-System/assets/113514374/238c6258-b835-4e38-83d4-d57d59b6ad11)
-- for train
+- To get the machines up and runnning
   ```
-  python train.py
+  vagrant up
   ```
-- for test
+- After the machines are running connect to ansible vm
   ```
-  python test.py
+  vagrant ssh ansible
   ```
-  ![image](https://github.com/Joselpsantos/MEI-System/assets/113514374/af8b3a6a-3663-413e-89e0-82a288488aa7)
+- In the vm terminal go to shared folder
+  ```
+  cd ../../vagrant
+  ```
+- Execute the following playbooks in this order
+  ```
+  ansible-playbook -i hosts 00_ssh_key_scan.yamll -v
+  
+  ansible-playbook -i hosts 01_add_ssh_key.yml --ask-pass
+
+  #This will install consul in all the nodes and setup the files needed fo service discovery
+  #Will also define the services to show in consul ui
+  ansible-playbook -i hosts 02_install_consul.yml -v
+
+  #Install nginx in the lload balancer, setup consul templates with nginx 
+  ansible-playbook -i hosts 03_install_nginx.yml -v
+  
+  ```
+  After steps it is possible to check the consul ui via http://192.168.44.70:8500/ui and get access to the web pages via http://http://192.168.44.25/
 
 ## Directory Hierarchy
 ```

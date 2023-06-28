@@ -1,89 +1,158 @@
 ---
     - name: Update the software package repository
+      become: true
       apt:
         update_cache: yes
 
-    - name: Install dependencies
-      package:
-        name: "{{ item }}"
-        state: latest
-      with_items:
-        - curl
-        - net-tools
-        - unzip
-
-    - name: Install consul
-      unarchive:
-        src: https://releases.hashicorp.com/consul/1.1.0/consul_1.1.0_linux_amd64.zip
-        dest: /usr/local/bin
-        remote_src: yes
-
-    - name: Verify consul installation
-      shell: "consul --version"
-      register: consul_version
-
-    - assert:
-        that:
-          - "'Consul' in consul_version.stdout"
-
-    - name: Create consul user
-      user:
+    - name: Install Consul
+      become: true
+      apt:
         name: consul
+        state: present
+      
+    #- name: Install consul-template
+    #  become: true
+    #  command: >
+    #    curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp.gpg
+    #  when: inventory_hostname == 'lb01'
+    - name: Install python3-apt
+      become: true
+      apt:
+        name: python3-apt
+        state: present
+      when: inventory_hostname == 'lb01'
 
-    - name: Create Consul /var directory
+    - name: Download HashiCorp GPG key
+      become: true
+      shell: 
+        curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp.gpg
+      when: inventory_hostname == 'lb01'
+
+    - name: Add hashicorp repo to systems resources
+      become: true
+      shell:
+        echo "deb [signed-by=/usr/share/keyrings/hashicorp.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
+      when: inventory_hostname == 'lb01'
+    
+    - name: Update package cache
+      become: true
+      apt:
+        update_cache: yes
+      when: inventory_hostname == 'lb01'
+      
+    - name: Install consul-template
+      become: true
+      shell:
+        sudo apt-get install consul-template
+      when: inventory_hostname == 'lb01'
+
+    - name: Create directories for Consul
       file:
-        path: /var/consul
+        path: /var/lib/consul
         state: directory
         owner: consul
         group: consul
-        mode: 0755
-
-    - name: Copy Consul configuration
-      copy:
-        src: files/consul.hcl
-        dest: /etc/consul.d/consul.hcl
-        mode: "0644"
+        mode: '0775'
+        recurse: yes
     
-    - name: Copy Consul systemd service file
-      copy:
-        src: files/consul.service
-        dest: /etc/systemd/system/consul.service
-        mode: "0644"
+    - name: Create /etc/consul.d directory
+      file:
+        path: /etc/consul.d
+        state: directory
+        owner: consul
+        group: consul
 
-    - name: Copy server.hcl file
+    - name: Create templates directory for load-balancing service
+      become: true
+      file:
+        path: /etc/templates
+        state: directory
+        mode: "0755"
+      when: inventory_hostname == 'lb01'
+
+    - name: Copy load-balancing template file
       become: true
       copy:
-        src: files/server.hcl
-        dest: /etc/consul.d/server.hcl
+        src: files/load-balancer.conf.ctmpl
+        dest: /etc/templates/
+      when: inventory_hostname == 'lb01'
+
+    - name: Copy consul.service file
+      template:
+        src: files/consul.service.j2
+        dest: /etc/systemd/system/consul.service
+        owner: root
+        group: root
+        mode: '0644'
+      when: inventory_hostname != 'consul'
+
+    - name: Copy config.json file
+      template:
+        src: files/config.json.j2
+        dest: /etc/consul.d/config.json
         owner: consul
         group: consul
-        mode: "0640"
+        mode: '0644'
+      when: inventory_hostname != 'consul'
 
-    - name: Enable and start Consul service
+    - name: Copy consul.service file
+      template:
+        src: files/consul.service
+        dest: /etc/systemd/system/consul.service
+        owner: root
+        group: root
+        mode: '0644'
+      when: inventory_hostname == 'consul'
+    
+    - name: Copy config.json file
+      template:
+        src: files/config.json
+        dest: /etc/consul.d/config.json
+        owner: consul
+        group: consul
+        mode: '0644'
+      when: inventory_hostname == 'consul'
+
+    - name: Reload systemd daemon
       systemd:
+        daemon_reload: yes
+
+    - name: Start Consul service
+      service:
         name: consul
         state: started
-        enabled: true
+        enabled: yes
 
-    - name: Create Consul bootstrap directory
+    - name: Check if Consul service is active
+      command: systemctl is-active --quiet consul
+      register: consul_active
+      changed_when: false
+
+    - name: Display Consul service status
+      debug:
+        msg: "Consul service is {{ 'active' if consul_active.rc == 0 else 'inactive' }}"
+
+    - name: Install nginx as reverse proxy
+      apt:
+        name: nginx
+        state: present
+      when: inventory_hostname == 'consul'
+
+    - name: Remove Nginx default conf file
+      become: true
       file:
-        path: /etc/consul.d/bootstrap
-        state: directory
-        mode: '0755'
+        path: /etc/nginx/sites-enabled/default
+        state: absent
+      when: inventory_hostname == 'consul'
 
-    - name: Copy configuration file
+    - name: Copy the reverse proxy file
       copy:
-        src: /files/bootstrap-config.json
-        dest: /etc/consul.d/bootstrap/config.json
-
-    - name: Copy systemd bootstrap consul.service
-      copy:
-        src: /files/bootstrap-consul.service
-        dest: /etc/systemd/system/consul.service
-
-    - name: Start bootstrap Consul
-      systemd:
-        name: consul.service
-        state: started
-
-
+        src: files/consul.conf
+        dest: /etc/nginx/sites-available/consul.conf
+      when: inventory_hostname == 'consul'
+      
+    - name: Restart Nginx
+      service:
+        name: nginx
+        state: restarted
+      when: inventory_hostname == 'consul'

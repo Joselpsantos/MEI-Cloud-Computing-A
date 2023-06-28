@@ -1,0 +1,18 @@
+{
+    "bootstrap": true,
+    "server": true,
+    "log_level": "DEBUG",
+    "enable_syslog": true,
+    "datacenter": "dc1",
+    "bind_addr": "192.168.44.70",
+    "node_name": "consul-server",
+    "data_dir": "/var/lib/consul",
+    "primary_datacenter": "dc1",
+    "acl_default_policy": "allow",
+    "encrypt": "UKteYxkHsRYraAfZULrS8ZddQCI59QLbyOdONWOFQf4=",
+    "ui": true,
+    "bootstrap_expect": 1,
+    "addresses":{
+    "http":"0.0.0.0"
+    }
+}
