@@ -1,0 +1,6 @@
+{
+    "service": {
+      "Name": "sockets",
+      "tags":["sockets", "web-dependency"]
+    }
+}

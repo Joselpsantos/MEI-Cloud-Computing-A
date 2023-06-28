@@ -1,115 +1,101 @@
-# -*- mode: ruby -*-
-# vi: set ft=ruby :
-
 Vagrant.configure("2") do |config|
 
-  config.vm.define "ansible" do |ansible|
-    ansible.vm.box = "generic/centos9s"
-    ansible.vm.hostname = "ansible-srv"
-    ansible.vm.network "private_network", ip: '192.168.33.50'
+    config.vm.define "ansible" do |ansible|
+        ansible.vm.box = "generic/centos7"
+        ansible.vm.hostname = "ansible-srv"
+        ansible.vm.network "private_network", ip: '192.168.44.20'
+    
+        ansible.vm.provider "virtualbox" do |v|
+            v.customize ["modifyvm", :id, "--groups", "/ProjectA-Experiment"]
+            v.name = "Ansible-VM"
+            v.memory = 1024
+            # v.linked_clone = true
+        end
+        ansible.vm.provision "shell", privileged: true, path: "./provision/install_ansible.sh"
 
-    ansible.vm.provider "virtualbox" do |v|
-      v.name = "Ansible-srv"
-      v.memory = 1024
-     # v.linked_clone = true
+        ansible.vm.provision "shell", privileged: false, inline: <<-SHELL
+          ssh-keygen -t rsa -N "" -f ~/.ssh/id_rsa
+        SHELL
+
+        ansible.vm.synced_folder '.', '/vagrant', disabled: false
+
+      end
+    
+    config.vm.define "lb01" do |lb01|
+        lb01.vm.box = "bento/ubuntu-22.04"
+        lb01.vm.hostname = "lb01"
+        lb01.vm.network "private_network", ip: '192.168.44.25'
+    
+        lb01.vm.provider "virtualbox" do |v|
+            v.customize ["modifyvm", :id, "--groups", "/ProjectA-Experiment"]
+            v.name = "lb01"
+            v.memory = 760
+
+            # v.linked_clone = true
+        end
+        
+        lb01.vm.synced_folder '.', '/vagrant', disabled: true
+      end
+
+    config.vm.define "webapp1" do |node|
+        node.vm.box = "bento/ubuntu-22.04"
+        node.vm.hostname = "webapp1"
+        node.vm.network :private_network, ip: "192.168.44.10"
+        node.vm.provider "virtualbox" do |v|
+            v.customize ["modifyvm", :id, "--groups", "/ProjectA-Experiment"]
+            v.name = "WebNode1"
+            v.memory = 760
+            v.cpus = 2
+            v.linked_clone = true
+      end
+      node.vm.provision "shell", privileged: true, path: "./provision/web.sh"
+
     end
-    ansible.vm.provision "shell", path: "./provision/install_ansible.sh"
 
-    ansible.vm.provision "shell", privileged: false, inline: <<-SHELL
-      ssh-keygen -t rsa -N "" -f ~/.ssh/id_rsa
-    SHELL
-    ansible.vm.synced_folder '.', '/vagrant', disabled: false
+    config.vm.define "webapp2" do |node|
+        node.vm.box = "bento/ubuntu-22.04"
+        node.vm.hostname = "webapp2"
+        node.vm.network :private_network, ip: "192.168.44.11"
+        node.vm.provider "virtualbox" do |v|
+            v.customize ["modifyvm", :id, "--groups", "/ProjectA-Experiment"]
+            v.name = "WebNode2"
+            v.memory = 760
+            v.cpus = 2
+            v.linked_clone = true
+        end
+        node.vm.provision "shell", privileged: true, path: "./provision/web.sh"
 
-  end
+      end
 
-  config.vm.define "lb01" do |lb01|
-    lb01.vm.box = "generic/ubuntu2204"
-    lb01.vm.hostname = "lb01"
-    lb01.vm.network "private_network", ip: '192.168.33.51'
+    config.vm.define "sockets" do |node|
+      node.vm.box = "bento/ubuntu-22.04"
+      node.vm.hostname = "sockets"
+      node.vm.network :private_network, ip: "192.168.44.15"
+      node.vm.provider "virtualbox" do |v|
+        v.customize ["modifyvm", :id, "--groups", "/ProjectA-Experiment"]
+        v.name = "SocketsNode"
+        v.memory = 760
+        v.cpus = 2
+        v.linked_clone = true
+      end
+      node.vm.provision "shell", path: "./provision/install_sockets_dependencies.sh"
 
-    lb01.vm.provider "virtualbox" do |v|
-      v.name = "Ansible-lb01"
-      v.memory = 1024
-     # v.linked_clone = true
     end
-    lb01.vm.synced_folder '.', '/vagrant', disabled: true
-  end
 
-  config.vm.define "web01" do |web01|
-    web01.vm.box = "generic/ubuntu2204"
-    web01.vm.hostname = "web01"
-    web01.vm.network "private_network", ip: '192.168.33.52'
+    config.vm.define "consul" do |node|
+      node.vm.box = "bento/ubuntu-22.04"
+      node.vm.hostname = "consul"
+      node.vm.network :private_network, ip: "192.168.44.70"
+      node.vm.provider "virtualbox" do |v|
+        v.customize ["modifyvm", :id, "--groups", "/ProjectA-Experiment"]
+        v.name = "consul-server"
+        v.memory = 760
+        v.cpus = 2
+        v.linked_clone = true
+      end
 
-    web01.vm.provider "virtualbox" do |v|
-      v.name = "Ansible-web01"
-      v.memory = 1024
-      # v.linked_clone = true
+      node.vm.synced_folder '.', '/vagrant', disabled: false
+
     end
-    web01.vm.provision "shell", path: "provision.sh"
-    web01.vm.provision "shell", privileged: false, inline: <<-SHELL
-    sudo bash -c 'echo "This is web01" > /var/www/html/index.html'
-    SHELL
-    web01.vm.synced_folder '.', '/vagrant', disabled: true
-  end
-
-  config.vm.define "web02" do |web02|
-    web02.vm.box = "generic/ubuntu2204"
-    web02.vm.hostname = "web02"
-    web02.vm.network "private_network", ip: '192.168.33.53'
-
-    web02.vm.provider "virtualbox" do |v|
-      v.name = "Ansible-web02"
-      v.memory = 1024
-      # v.linked_clone = true
-    end
-    web02.vm.provision "shell", path: "provision.sh"
-    web02.vm.provision "shell", privileged: false, inline: <<-SHELL
-    sudo bash -c 'echo "This is web02" > /var/www/html/index.html'
-    SHELL
-    web02.vm.synced_folder '.', '/vagrant', disabled: true
-  end
-
-  config.vm.define "master" do |master|
-    master.vm.box = "generic/ubuntu2204"
-    master.vm.hostname = "master"
-    master.vm.network "private_network", ip: "192.168.33.10"
-    master.vm.provider "virtualbox" do |vb|
-      vb.name = "postgresql-master"
-      vb.memory = "1024"
-    end
-    master.vm.provision "shell", inline: <<-SHELL
-      sudo apt-get update
-      sudo apt-get install -y postgresql postgresql-contrib
-      # Configure master PostgreSQL settings here
-    SHELL
-  end
-
-  config.vm.define "replica" do |replica|
-    replica.vm.box = "generic/ubuntu2204"
-    replica.vm.hostname = "replica"
-    replica.vm.network "private_network", ip: "192.168.33.20"
-    replica.vm.provider "virtualbox" do |vb|
-      vb.name = "postgresql-replica"
-      vb.memory = "1024"
-    end
-    replica.vm.provision "shell", inline: <<-SHELL
-      sudo apt-get update
-      sudo apt-get install -y postgresql postgresql-contrib
-      # Configure replica PostgreSQL settings here
-    SHELL
-  end
-
-  config.vm.define "consul" do |consul|
-    consul.vm.box = "generic/ubuntu2204"
-    consul.vm.hostname = "consul"
-    consul.vm.network "private_network", ip: '192.168.33.54'
-
-    consul.vm.provider "virtualbox" do |v|
-      v.name = "Ansible-consul"
-      v.memory = 1024
-      # v.linked_clone = true
-    end
-    consul.vm.synced_folder '.', '/vagrant', disabled: true
-  end
 
 end
