@@ -25,6 +25,7 @@ echo -e "$MSG_COLOR$(hostname): Import dump.sql and set user privileges\033[0m"
 # PGPASSWORD=mypassword sudo -u postgres psql -U myuser -h localhost -d mydatabase -f /vagrant/provision/dump.sql # change to ./provision/dump.sql
 sudo -u postgres psql -d mydatabase -f /vagrant/provision/dump.sql
 sudo -u postgres psql -d mydatabase -f /vagrant/provision/dump_sessions_table.sql
+sudo -u postgres psql -d mydatabase -f /vagrant/provision/dump_files_table.sql
 sudo -u postgres psql -d mydatabase -c "GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE messages TO myuser;" # uneeded?
 sudo -u postgres psql -d mydatabase -c "GRANT USAGE, SELECT, UPDATE ON SEQUENCE messages_id_seq TO myuser;"
 sudo -u postgres psql -d mydatabase -c "GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO myuser;"
