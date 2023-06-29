@@ -1,0 +1,5 @@
+- name: Install postgres
+  hosts: databases_nodes
+  become: true
+  roles:
+    - /vagrant/roles/postgres

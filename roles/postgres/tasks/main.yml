@@ -1,105 +1,85 @@
 ---
-    - name: Install dependencies for PostgreSQL
-      apt: name={{ item }} update_cache=true state=latest
-      with_items:
-      - bash
-      - openssl
-      - libssl-dev
-      - libssl-doc
-    - name: Install PostgreSQL 
-      apt: name={{ item }} update_cache=true state=present
+    - name: Install packages
+      ansible.builtin.apt:
+        name:
+          - postgresql
+          - postgresql-contrib
+          - libpq-dev
+          - python3-psycopg2
+        state: present
+
+    - name: "Find out if PostgreSQL is initialized"
+      ansible.builtin.stat:
+        path: "/etc/postgresql/14/main/pg_hba.conf"
+      register: postgres_data
+
+    - name: Initialize PostgreSQL
+      ansible.builtin.shell: "pg_ctl initdb -D /var/lib/pgsql/data"
+      when: not postgres_data.stat.exists
+ 
+    - name: "Start and enable services"
+      service: "name={{ item }} state=started enabled=yes"
       with_items:
         - postgresql
-        - postgresql-contrib
-        - libpq-dev
-        - python3-psycopg2
-    - name: Ensure the PostgreSQL service is running
-      service: name=postgresql state=started enabled=yes
 
-    - name: Copy the postgresql.conf
-      become: true
-      copy:
-        src: files/postgresql.conf
-        dest: /etc/postgresql/14/main/
-    
-    - name: Copy the pg_hba.conf
-      become: true
-      copy:
-        src: files/pg_hba.conf
-        dest: /etc/postgresql/14/main/
-
-    - name: Copy the pg_ident.conf
-      become: true
-      copy:
-        src: files/pg_ident.conf
-        dest: /etc/postgresql/14/main/
-
-    - name: Restart PostgreSQL service
-      become: true
-      service:
-        name: postgresql
-        state: restarted
-
-    - name: Create the database specified in vars
-
-      #become_user: postgres
-      postgresql_db: name={{ db_name }}
-         template='template0'
-          state=present
-    
-    - name: Ensure user has access to the new database
-      become: true
-      #become_user: postgres
-      postgresql_user: 
-        db={{ db_name }}
-        name={{ db_user }}
-        password={{ db_password }}
-        priv=ALL
-        state=present 
-
-    #- name: Create a new PostgreSQL user and database
-    #  become: true
-    #  postgresql_user:
-    #    db: "{{ db_name }}"
-    #    name: "{{ db_user }}"
-    #    password: "{{ db_password }}"
-    #    state: present
-    #    login_user: "{{ db_user }}"
-    #    login_password: "{{ db_password }}"
-   
-    #- name: Create a new PostgreSQL database
-    #  become: true
-    #  postgresql_db:
-    #    name: "{{ db_name }}"
-    #    owner: "{{ db_user }}"
-    #    state: present
-
-    #- name: Grant privileges on the PostgreSQL database
-    #  become: true
-    #  postgresql_privs:
-    #    db: "{{ db_name }}"
-    #    role: "{{ db_user }}"
-    #    priv: ALL
-    #    state: present
-
-    - name: Restart PostgreSQL service
-      become: true
-      service:
-        name: postgresql
-        state: restarted
-
-    - name: Drop table in PostgreSQL database
-      become: true
-      postgresql_query:
-        db: "{{ db_name }}"
-        query: "DROP TABLE IF EXISTS test;"
-
-    - name: Import dump.sql and set user privileges
-      become: true
+    - name: "Create app database"
       postgresql_db:
-        db: "{{ db_name }}"
-        state: import
-        target: /vagrant/provision/dump.sql
+        state: present
+        name: "{{ db_name }}"
+      become: true
+      become_user: vagrant
+      become_method: sudo
+      vars:
+        ansible_postgresql_login_password: "{{ db_password }}"
+
+    - name: "Create db user"
+      postgresql_user:
+        state: present
+        name: "{{ db_user }}"
+        password: "{{ db_password }}"
+      become: true
+      become_user: vagrant
+      become_method: sudo
+
+    - name: "Grant db user access to app db"
+      postgresql_privs:
+        type: database
+        database: "{{ db_name }}"
+        roles: "{{ db_user }}"
+        grant_option: no
+        privs: all
+      become: true
+      become_user: vagrant
+      become_method: sudo
+
+    - name: "Allow md5 connection for the db user"
+      lineinfile:
+        path: /etc/postgresql/14/main/pg_hba.conf
+        line: "host    all             {{ db_user }}             0.0.0.0/0            md5"
+        insertafter: '^# TYPE  DATABASE        USER            ADDRESS                 METHOD'
+      become: true
+      #become_user: vagrant
+      #become_method: sudo
+      
+    #- name: Drop table test
+    #  shell: "sudo -u postgres psql -d mydatabase -c \"DROP TABLE test;\""
+ 
+    #- name: "Load SQL script into a variable"
+    #  set_fact:
+    #    migration_sql: "{{ lookup('file', 'files/dump.sql') }}"
+
+    #- name: "Execute script from variable"
+    #  shell: "sudo -u psql -d {{ db_name }} -c {{ migration_sql }}"
+    #  #become_user: vagrant
+    #  become: true
+    #  register: sql_response_variable
+
+    - name: Execute SQL commands
+      shell:
+        cmd: psql -U your_postgresql_user -d mydatabase -c "CREATE TABLE IF NOT EXISTS messages (id serial PRIMARY KEY, message varchar(255) NOT NULL, created_at timestamp DEFAULT current_timestamp); TRUNCATE TABLE messages; INSERT INTO messages (message, created_at) VALUES ('Cloud Computing and Virtualization Class', current_timestamp); INSERT INTO messages (message, created_at) VALUES ('Provisioning my_app with Ansible', current_timestamp); INSERT INTO messages (message, created_at) VALUES ('Ansible is fun and we all gonna fail this class! &#129394;', current_timestamp);"
+      become: true
+      become_user: vagrant
+      
 
     - name: Grant specific privileges on PostgreSQL tables and sequences
       become: true
@@ -114,45 +94,20 @@
     - name: Grant privileges on all tables and sequences in the public schema
       become: true
       postgresql_privs:
-        db: "{{ db_name }}"
+        db: "{{ db_user }}"
         role: "{{ db_user }}"
         priv: ALL
         schema: public
         state: present
 
-    - name: View users and databases in PostgreSQL
+    - name: Copy postgres.conf 'files/dump.sql'
       become: true
-      postgresql_query:
-        db: "{{ db_name }}"
-        query: "\\du"
+      copy: 
+        src: files/postgresql.conf
+        dest: "/etc/postgresql/14/main/"
 
-    - name: View databases in PostgreSQL
-      become: true
-      postgresql_query:
-        db: "{{ db_name }}"
-        query: "\\list"
-
-    - name: View tables in PostgreSQL database
-      become: true
-      postgresql_query:
-        db: "{{ db_name }}"
-        query: "\\dt"
-      
     - name: Restart PostgreSQL service
       become: true
       service:
         name: postgresql
         state: restarted
-
-    - name: Check PostgreSQL service status
-      systemd:
-        name: postgresql
-        state: started
-      register: postgres_status
-
-    - name: Assert PostgreSQL service is running
-      assert:
-        that:
-          - postgres_status.changed
-          - postgres_status.state == 'started'
-      
