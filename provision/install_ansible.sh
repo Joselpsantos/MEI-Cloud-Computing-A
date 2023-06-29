@@ -14,3 +14,6 @@ yum install nc
 echo "Install Nano"
 sudo yum install -y nano
 
+sudo yum install python3-psycopg2
+
+python3 -c "import psycopg2"

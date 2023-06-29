@@ -1,0 +1,177 @@
+---
+    - name: Update package lists
+      become: true
+      apt:
+        update_cache: yes
+
+    - name: Install PHP-FPM and necessary modules
+      become: true
+      apt:
+        name:
+          - php
+          - php-fpm
+          - php-common
+          - php-cli
+          - php-mysql
+          - php-pgsql
+          - php-pdo
+          - php-mbstring
+          - php-zip
+          - zip
+          - unzip
+        state: present
+
+    - name: Install PostgreSQL and its PHP extension
+      become: true
+      apt:
+        name:
+          - postgresql
+          - postgresql-contrib
+          - php-pgsql
+        state: present
+
+    - name: Install python3-psycopg2 package
+      become: true
+      apt:
+        name: python3-psycopg2
+        state: present
+
+    - name: Check psycopg2 library importability
+      command: python3 -c "import psycopg2"
+      register: psycopg2_check
+      ignore_errors: true
+
+    - name: Copy the postgresql.conf
+      become: true
+      copy:
+        src: files/postgresql.conf
+        dest: /etc/postgresql/14/main/
+    
+    - name: Copy the pg_hba.conf
+      become: true
+      copy:
+        src: files/pg_hba.conf
+        dest: /etc/postgresql/14/main/
+
+    - name: Restart PostgreSQL service
+      become: true
+      service:
+        name: postgresql
+        state: restarted
+
+    - name: Create the database specified in vars
+
+      become_user: postgres
+      postgresql_db: name={{ db_name }}
+         template='template0'
+          state=present
+    
+    - name: Ensure user has access to the new database
+      become: true
+      become_user: postgres
+      postgresql_user: 
+        db={{ db_name }}
+        name={{ db_user }}
+        password={{ db_password }}
+        priv=ALL
+        state=present 
+
+    #- name: Create a new PostgreSQL user and database
+    #  become: true
+    #  postgresql_user:
+    #    db: "{{ db_name }}"
+    #    name: "{{ db_user }}"
+    #    password: "{{ db_password }}"
+    #    state: present
+    #    login_user: "{{ db_user }}"
+    #    login_password: "{{ db_password }}"
+   
+    #- name: Create a new PostgreSQL database
+    #  become: true
+    #  postgresql_db:
+    #    name: "{{ db_name }}"
+    #    owner: "{{ db_user }}"
+    #    state: present
+
+    #- name: Grant privileges on the PostgreSQL database
+    #  become: true
+    #  postgresql_privs:
+    #    db: "{{ db_name }}"
+    #    role: "{{ db_user }}"
+    #    priv: ALL
+    #    state: present
+
+    - name: Restart PostgreSQL service
+      become: true
+      service:
+        name: postgresql
+        state: restarted
+
+    - name: Drop table in PostgreSQL database
+      become: true
+      postgresql_query:
+        db: "{{ db_name }}"
+        query: "DROP TABLE IF EXISTS test;"
+
+    - name: Import dump.sql and set user privileges
+      become: true
+      postgresql_db:
+        db: "{{ db_name }}"
+        state: import
+        target: /vagrant/provision/dump.sql
+
+    - name: Grant specific privileges on PostgreSQL tables and sequences
+      become: true
+      postgresql_privs:
+        db: "{{ db_name }}"
+        role: "{{ db_user }}"
+        obj: messages
+        priv: SELECT, INSERT, UPDATE, DELETE
+        type: TABLE
+        state: present
+
+    - name: Grant privileges on all tables and sequences in the public schema
+      become: true
+      postgresql_privs:
+        db: "{{ db_name }}"
+        role: "{{ db_user }}"
+        priv: ALL
+        schema: public
+        state: present
+
+    - name: View users and databases in PostgreSQL
+      become: true
+      postgresql_query:
+        db: "{{ db_name }}"
+        query: "\\du"
+
+    - name: View databases in PostgreSQL
+      become: true
+      postgresql_query:
+        db: "{{ db_name }}"
+        query: "\\list"
+
+    - name: View tables in PostgreSQL database
+      become: true
+      postgresql_query:
+        db: "{{ db_name }}"
+        query: "\\dt"
+      
+    - name: Restart PostgreSQL service
+      become: true
+      service:
+        name: postgresql
+        state: restarted
+
+    - name: Check PostgreSQL service status
+      systemd:
+        name: postgresql
+        state: started
+      register: postgres_status
+
+    - name: Assert PostgreSQL service is running
+      assert:
+        that:
+          - postgres_status.changed
+          - postgres_status.state == 'started'
+      

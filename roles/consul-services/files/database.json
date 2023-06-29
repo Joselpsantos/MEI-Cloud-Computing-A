@@ -1,0 +1,6 @@
+{
+    "service": {
+      "Name": "database",
+      "tags":["DB", "web-dependency"]
+    }
+}

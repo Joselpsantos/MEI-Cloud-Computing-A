@@ -131,28 +131,3 @@
     - name: Display Consul service status
       debug:
         msg: "Consul service is {{ 'active' if consul_active.rc == 0 else 'inactive' }}"
-
-    - name: Install nginx as reverse proxy
-      apt:
-        name: nginx
-        state: present
-      when: inventory_hostname == 'consul'
-
-    - name: Remove Nginx default conf file
-      become: true
-      file:
-        path: /etc/nginx/sites-enabled/default
-        state: absent
-      when: inventory_hostname == 'consul'
-
-    - name: Copy the reverse proxy file
-      copy:
-        src: files/consul.conf
-        dest: /etc/nginx/sites-available/consul.conf
-      when: inventory_hostname == 'consul'
-      
-    - name: Restart Nginx
-      service:
-        name: nginx
-        state: restarted
-      when: inventory_hostname == 'consul'

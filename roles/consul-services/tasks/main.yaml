@@ -5,6 +5,12 @@
         dest: /etc/consul.d
       when: inventory_hostname in ['webapp1', 'webapp2']
 
+    - name: Copy service file (Databases)
+      copy:
+        src: files/database.json
+        dest: /etc/consul.d
+      when: inventory_hostname in ['database1', 'database2']
+
     #- name: Copy configuration file (Load Balancer)
     #  copy:
     #    src: files/consul-template-config.hcl
