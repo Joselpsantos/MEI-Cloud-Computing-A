@@ -31,3 +31,5 @@ echo -e "$MSG_COLOR$(hostname): View users and databases in PostgreSQL\033[0m"
 sudo -u postgres psql -c "\dRs+"
 sudo -u postgres psql -c "\list"
 sudo -u postgres psql -d mydatabase -c "\dt"
+
+sudo -u postgres psql -d mydatabase -c "Select * from messages;"
