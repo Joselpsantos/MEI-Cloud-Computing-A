@@ -95,7 +95,7 @@ Vagrant.configure("2") do |config|
       end
       
       node.vm.synced_folder './provision', '/vagrant', disabled: false
-      node.vm.provision "shell", path: "./provision/install_database_dependencies.sh"
+      node.vm.provision "shell", path: "./provision/install_database_dependencies_master.sh"
 
     end
 
@@ -112,7 +112,7 @@ Vagrant.configure("2") do |config|
       end
       
       node.vm.synced_folder './provision', '/vagrant', disabled: false
-      node.vm.provision "shell", path: "./provision/install_database_dependencies.sh"
+      node.vm.provision "shell", path: "./provision/install_database_dependencies_slave.sh"
 
     end
 
