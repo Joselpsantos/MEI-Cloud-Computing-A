@@ -1,0 +1,5 @@
+- name: Install NGINX
+  hosts: lb01 # escolher o(s) node(s) para o NGINX
+  become: true
+  roles:
+    - /vagrant/roles/nginx # install nginx

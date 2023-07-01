@@ -1,0 +1,11 @@
+- name: Get IP Address with Ansible
+  hosts: all_nodes
+  gather_facts: yes
+  tasks:
+    - name: Display IP Address
+      set_fact: hostvars[inventory_hostname]['ansible_' + eth1]['ipv4']['address']
+      debug: 
+        #var: hostvars[inventory_hostname]['ansible_' + interface_name]['ipv4']['address']
+      vars:
+        interface_name: hostvars[inventory_hostname]['ansible_' + eth1]['ipv4']['address']
+    - n

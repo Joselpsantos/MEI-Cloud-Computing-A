@@ -1,0 +1,21 @@
+[Unit]
+Description="Service Discovery"
+Wants=network-online.target
+After=network-online.target
+[Service]
+Type=simple
+User=consul
+Group=consul
+ExecStart=/usr/bin/consul agent -server -ui \
+                -advertise=192.168.44.70 \
+                -bind=192.168.44.70 \
+                -data-dir=/var/lib/consul \
+                -node=consul-server \
+                -config-dir=/etc/consul.d
+ExecReload=/bin/kill --signal HUP $MAINPID
+KillSignal=SIGINT
+TimeoutStopSec=5
+Restart=on-failure
+SyslogIdentifier=consul
+[Install]
+WantedBy=multi-user.target
