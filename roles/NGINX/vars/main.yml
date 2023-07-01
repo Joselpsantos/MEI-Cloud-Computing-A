@@ -1,0 +1,2 @@
+app_root: roles/NGINX/templates/
+document_root: /var/www/html/
