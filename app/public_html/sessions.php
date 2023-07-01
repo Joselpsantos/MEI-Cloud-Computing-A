@@ -1,6 +1,8 @@
 <?php include '_dotenv.php'; ?>
 
 <?php
+
+require_once 'sessions_dependency.php';
 session_set_cookie_params(86400); // Set the session cookie's lifetime to 24 hours (in seconds)
 session_start();
 

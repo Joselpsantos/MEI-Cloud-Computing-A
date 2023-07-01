@@ -8,7 +8,7 @@ Vagrant.configure("2") do |config|
         ansible.vm.provider "virtualbox" do |v|
             v.customize ["modifyvm", :id, "--groups", "/ProjectA-Experiment"]
             v.name = "Ansible-VM"
-            v.memory = 1024
+            v.memory = 760
             # v.linked_clone = true
         end
         ansible.vm.provision "shell", privileged: true, path: "./provision/install_ansible.sh"
@@ -79,6 +79,40 @@ Vagrant.configure("2") do |config|
         v.linked_clone = true
       end
       node.vm.provision "shell", path: "./provision/install_sockets_dependencies.sh"
+
+    end
+
+    config.vm.define "database1" do |node|
+      node.vm.box = "bento/ubuntu-22.04"
+      node.vm.hostname = "database1"
+      node.vm.network :private_network, ip: "192.168.44.30"
+      node.vm.provider "virtualbox" do |v|
+        v.customize ["modifyvm", :id, "--groups", "/ProjectA-Experiment"]
+        v.name = "DatabaseNode1"
+        v.memory = 760
+        v.cpus = 2
+        v.linked_clone = true
+      end
+      
+      node.vm.synced_folder './provision', '/vagrant', disabled: false
+      node.vm.provision "shell", path: "./provision/install_database_dependencies_master.sh"
+
+    end
+
+    config.vm.define "database2" do |node|
+      node.vm.box = "bento/ubuntu-22.04"
+      node.vm.hostname = "database2"
+      node.vm.network :private_network, ip: "192.168.44.31"
+      node.vm.provider "virtualbox" do |v|
+        v.customize ["modifyvm", :id, "--groups", "/ProjectA-Experiment"]
+        v.name = "DatabaseNode2"
+        v.memory = 760
+        v.cpus = 2
+        v.linked_clone = true
+      end
+      
+      node.vm.synced_folder './provision', '/vagrant', disabled: false
+      node.vm.provision "shell", path: "./provision/install_database_dependencies_slave.sh"
 
     end
 
