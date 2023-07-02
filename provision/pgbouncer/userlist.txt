@@ -1,0 +1,2 @@
+"read" "read" mydatabase_read
+"write" "write" mydatabase_write

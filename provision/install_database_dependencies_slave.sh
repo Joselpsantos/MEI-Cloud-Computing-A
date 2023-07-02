@@ -8,7 +8,14 @@ echo -e "$MSG_COLOR$(hostname): Install PostgreSQL and its PHP extension\033[0m"
 sudo apt-get install -y postgresql postgresql-contrib php-pgsql
 
 echo -e "$MSG_COLOR$(hostname):  Create database\033[0m"
+sudo -u postgres psql -c "CREATE USER myuser WITH PASSWORD 'mypassword';"
+sudo -u postgres psql -c "CREATE USER write WITH PASSWORD 'write';"
+sudo -u postgres psql -c "CREATE USER read WITH PASSWORD 'read';"
 sudo -u postgres psql -c "CREATE DATABASE mydatabase;"
+sudo -u postgres psql -c "CREATE DATABASE mydatabase OWNER myuser;"
+sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE mydatabase TO myuser;"
+sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE mydatabase TO write;"
+sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE mydatabase TO read;"
 sudo -u postgres psql -c "\c mydatabase"
 #Criar a tabela
 

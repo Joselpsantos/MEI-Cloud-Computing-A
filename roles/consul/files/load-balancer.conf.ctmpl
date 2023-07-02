@@ -1,4 +1,5 @@
 upstream backend {
+   least_conn;
 {{- range service "web" }}
   server {{ .Address }}:{{ .Port }};
 {{- end }}

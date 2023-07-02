@@ -16,5 +16,9 @@ $db_pass = $_ENV['DB_PASS'];
 $db_name = $_ENV['DB_NAME'];
 $ws_host = $_ENV['WS_HOST'];
 $ws_port = $_ENV['WS_PORT'];
+$write_db_user = $_ENV['DB_USER_WRITE'];
+$write_db_pass = $_ENV['DB_PASS_WRITE'];
+$read_db_user = $_ENV['DB_USER_READ'];
+$read_db_pass = $_ENV['DB_PASS_READ'];
 // Use the $badge variable in your page
 ?>

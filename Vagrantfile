@@ -116,6 +116,23 @@ Vagrant.configure("2") do |config|
 
     end
 
+    config.vm.define "pgbouncer" do |node|
+      node.vm.box = "bento/ubuntu-22.04"
+      node.vm.hostname = "pgbouncer"
+      node.vm.network :private_network, ip: "192.168.44.40"
+      node.vm.provider "virtualbox" do |v|
+        v.customize ["modifyvm", :id, "--groups", "/ProjectA"]
+        v.name = "PgBouncer"
+        v.memory = 760
+        v.cpus = 2
+        v.linked_clone = true
+      end
+      
+      node.vm.synced_folder './provision', '/vagrant', disabled: false
+      #node.vm.provision "shell", path: "./provision/install_database_dependencies_slave.sh"
+
+    end
+
     config.vm.define "consul" do |node|
       node.vm.box = "bento/ubuntu-22.04"
       node.vm.hostname = "consul"
