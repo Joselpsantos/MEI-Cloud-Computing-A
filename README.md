@@ -1,21 +1,26 @@
+
 Title
 ===
 Abstract:xxx
 ## Papar Information
-- Title:  `paper name`
+- Title:  `Cloud computing project part A`
 - Authors:  José Santos and Rui Paiva
 - Preprint: [https://arxiv.org/abs/xx]()
 - Full-preprint: [paper position]()
 - 
-![image](https://github.com/Joselpsantos/MEI-System/assets/113514374/238c6258-b835-4e38-83d4-d57d59b6ad11)
+
+![image](https://github.com/Joselpsantos/MEI-Cloud-Computing-A/assets/113514374/a52521fd-1983-45f2-8336-48a5e6dea447)
+
+#### Connections ubtitle:
+* Green - Sockets
+* Red - Load Balancer
+* Black - Database
 
 ## Install & Dependence
 - Virtual Box
 - Vagrant
-- Ansible
 
 ## How to use
-
 
 - To get the machines up and runnning
   ```
@@ -41,33 +46,32 @@ Abstract:xxx
 
   #Install nginx in the lload balancer, setup consul templates with nginx 
   ansible-playbook -i hosts 03_install_nginx.yml -v
-  
+  ```
+
+- To activate the websockets server:
+  ```
+  vagrant ssh sockets
+  cd /vagrant/ws
+  php websockets_server.php
   ```
   After steps it is possible to check the consul ui via http://192.168.44.70:8500/ui and get access to the web pages via http://http://192.168.44.25/
+## Node Specs
+### Load Balancer
 
-## Directory Hierarchy
-```
-```
-## Code Details
-### Tested Platform
-- software
-  ```
-  OS: Debian unstable (May 2021), Ubuntu LTS
-  Python: 3.8.5 (anaconda)
-  PyTorch: 1.7.1, 1.8.1
-  ```
-- hardware
-  ```
-  CPU: Intel Xeon 6226R
-  GPU: Nvidia RTX3090 (24GB)
-  ```
-### Hyper parameters
-```
-```
-## References
-- [paper-1]()
-- [paper-2]()
-- [code-1](https://github.com)
-- [code-2](https://github.com)
+The load balancer is configured with nginx and consul templates to detect new or downed web nodes.
+
+### Web Server
+
+The web server only runs php code and serves the site.
+
+### Web Sockets 
+
+The web sockets service was divided into a node of its own.
+
+### Database 
+
+The database was separated from the web node. There are two database nodes, one is the master server and the other is the replica. In this moment the pgbouncer is not running. When it is it will be possible automatticly serve the web nodes with high availability.
+
+
   
 
