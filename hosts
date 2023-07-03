@@ -20,6 +20,7 @@ webapp2
 sockets
 consul
 database1
+database2
 
 [web_lb]
 lb01
