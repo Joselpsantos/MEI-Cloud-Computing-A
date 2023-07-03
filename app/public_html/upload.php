@@ -1,4 +1,14 @@
-<?php include '_dotenv.php'; ?>
+<?php
+
+include '_dotenv.php';
+
+// Read-only database connection using the read user
+$read_dbh = new PDO("pgsql:host=$db_host;port=$db_port;dbname=$db_name", $read_db_user, $read_db_pass);
+
+// Write database connection using the write user
+$write_dbh = new PDO("pgsql:host=$db_host;port=$db_port;dbname=$db_name", $write_db_user, $write_db_pass);
+
+?>
 
 <!DOCTYPE html>
 <html>
@@ -35,9 +45,8 @@
         // Check if the uploaded file is a JPG image
         if ($fileType === 'jpg' || $fileType === 'jpeg') {
           if (move_uploaded_file($_FILES['image']['tmp_name'], $targetPath)) {
-            // Store image file in the database
-            $dbh = new PDO("pgsql:host=$db_host;port=$db_port;dbname=$db_name", $db_user, $db_pass);
-            $q = $dbh->prepare("INSERT INTO image (filename) VALUES (?)");
+            // Store image file in the database using the write connection
+            $q = $write_dbh->prepare("INSERT INTO image (filename) VALUES (?)");
             $q->bindParam(1, $fileName);
             $q->execute();
 
@@ -52,9 +61,8 @@
 
       // Handle clear gallery button click
       if (isset($_POST['clear'])) {
-        // Delete images from the database
-        $dbh = new PDO("pgsql:host=$db_host;port=$db_port;dbname=$db_name", $db_user, $db_pass);
-        $q = $dbh->prepare("DELETE FROM image");
+        // Delete images from the database using the write connection
+        $q = $write_dbh->prepare("DELETE FROM image");
         $q->execute();
 
         // Delete images from the server
@@ -84,23 +92,14 @@
           <!-- Display clear gallery button -->
           <form method="POST">
             <div class="form-group mt-md-4">
-              <button type="submit" class="btn">
+              <button type="submit" class="btn btn-danger" name="clear">Clear Gallery</button>
             </div>
           </form>
         </div>
-        <div class="col-md-6">
-        <!-- Display clear gallery button -->
-        <form method="POST">
-          <div class="form-group mt-md-4">
-            <button type="submit" class="btn btn-danger" name="clear">Clear Gallery</button>
-          </div>
-        </form>
-      </div>
       </div>
       <div class="row">
         <?php
-        $dbh = new PDO("pgsql:host=$db_host;port=$db_port;dbname=$db_name", $db_user, $db_pass);
-        $q = $dbh->prepare("SELECT filename FROM image");
+        $q = $read_dbh->prepare("SELECT filename FROM image");
         $q->execute();
         $images = $q->fetchAll(PDO::FETCH_COLUMN);
 
@@ -111,3 +110,8 @@
         }
         ?>
       </div>
+    </div>
+  </main>
+</body>
+
+</html>

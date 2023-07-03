@@ -12,8 +12,12 @@ sudo -u postgres psql -c "CREATE ROLE replica REPLICATION LOGIN PASSWORD 'mypass
 
 echo -e "$MSG_COLOR$(hostname): Create a new PostgreSQL user and database\033[0m"
 sudo -u postgres psql -c "CREATE USER myuser WITH PASSWORD 'mypassword';"
+sudo -u postgres psql -c "CREATE USER write WITH PASSWORD 'write';"
+sudo -u postgres psql -c "CREATE USER read WITH PASSWORD 'read';"
 sudo -u postgres psql -c "CREATE DATABASE mydatabase OWNER myuser;"
 sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE mydatabase TO myuser;"
+sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE mydatabase TO write;"
+
 sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE mydatabase TO replica;"
 
 # peer access to myuser

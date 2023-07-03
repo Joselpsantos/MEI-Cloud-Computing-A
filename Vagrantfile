@@ -6,7 +6,7 @@ Vagrant.configure("2") do |config|
         ansible.vm.network "private_network", ip: '192.168.44.20'
     
         ansible.vm.provider "virtualbox" do |v|
-            v.customize ["modifyvm", :id, "--groups", "/ProjectA-Experiment"]
+            v.customize ["modifyvm", :id, "--groups", "/ProjectA"]
             v.name = "Ansible-VM"
             v.memory = 760
             # v.linked_clone = true
@@ -27,7 +27,7 @@ Vagrant.configure("2") do |config|
         lb01.vm.network "private_network", ip: '192.168.44.25'
     
         lb01.vm.provider "virtualbox" do |v|
-            v.customize ["modifyvm", :id, "--groups", "/ProjectA-Experiment"]
+            v.customize ["modifyvm", :id, "--groups", "/ProjectA"]
             v.name = "lb01"
             v.memory = 760
 
@@ -42,7 +42,7 @@ Vagrant.configure("2") do |config|
         node.vm.hostname = "webapp1"
         node.vm.network :private_network, ip: "192.168.44.10"
         node.vm.provider "virtualbox" do |v|
-            v.customize ["modifyvm", :id, "--groups", "/ProjectA-Experiment"]
+            v.customize ["modifyvm", :id, "--groups", "/ProjectA"]
             v.name = "WebNode1"
             v.memory = 760
             v.cpus = 2
@@ -57,7 +57,7 @@ Vagrant.configure("2") do |config|
         node.vm.hostname = "webapp2"
         node.vm.network :private_network, ip: "192.168.44.11"
         node.vm.provider "virtualbox" do |v|
-            v.customize ["modifyvm", :id, "--groups", "/ProjectA-Experiment"]
+            v.customize ["modifyvm", :id, "--groups", "/ProjectA"]
             v.name = "WebNode2"
             v.memory = 760
             v.cpus = 2
@@ -72,7 +72,7 @@ Vagrant.configure("2") do |config|
       node.vm.hostname = "sockets"
       node.vm.network :private_network, ip: "192.168.44.15"
       node.vm.provider "virtualbox" do |v|
-        v.customize ["modifyvm", :id, "--groups", "/ProjectA-Experiment"]
+        v.customize ["modifyvm", :id, "--groups", "/ProjectA"]
         v.name = "SocketsNode"
         v.memory = 760
         v.cpus = 2
@@ -87,7 +87,7 @@ Vagrant.configure("2") do |config|
       node.vm.hostname = "database1"
       node.vm.network :private_network, ip: "192.168.44.30"
       node.vm.provider "virtualbox" do |v|
-        v.customize ["modifyvm", :id, "--groups", "/ProjectA-Experiment"]
+        v.customize ["modifyvm", :id, "--groups", "/ProjectA"]
         v.name = "DatabaseNode1"
         v.memory = 760
         v.cpus = 2
@@ -104,7 +104,7 @@ Vagrant.configure("2") do |config|
       node.vm.hostname = "database2"
       node.vm.network :private_network, ip: "192.168.44.31"
       node.vm.provider "virtualbox" do |v|
-        v.customize ["modifyvm", :id, "--groups", "/ProjectA-Experiment"]
+        v.customize ["modifyvm", :id, "--groups", "/ProjectA"]
         v.name = "DatabaseNode2"
         v.memory = 760
         v.cpus = 2
@@ -116,12 +116,29 @@ Vagrant.configure("2") do |config|
 
     end
 
+    config.vm.define "pgbouncer" do |node|
+      node.vm.box = "bento/ubuntu-22.04"
+      node.vm.hostname = "pgbouncer"
+      node.vm.network :private_network, ip: "192.168.44.40"
+      node.vm.provider "virtualbox" do |v|
+        v.customize ["modifyvm", :id, "--groups", "/ProjectA"]
+        v.name = "PgBouncer"
+        v.memory = 760
+        v.cpus = 2
+        v.linked_clone = true
+      end
+      
+      node.vm.synced_folder './provision', '/vagrant', disabled: false
+      #node.vm.provision "shell", path: "./provision/install_database_dependencies_slave.sh"
+
+    end
+
     config.vm.define "consul" do |node|
       node.vm.box = "bento/ubuntu-22.04"
       node.vm.hostname = "consul"
       node.vm.network :private_network, ip: "192.168.44.70"
       node.vm.provider "virtualbox" do |v|
-        v.customize ["modifyvm", :id, "--groups", "/ProjectA-Experiment"]
+        v.customize ["modifyvm", :id, "--groups", "/ProjectA"]
         v.name = "consul-server"
         v.memory = 760
         v.cpus = 2
