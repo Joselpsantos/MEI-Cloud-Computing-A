@@ -80,5 +80,8 @@ Ubuntu - Posgresql
 ### Service discovery
 Ubuntu - Consul
 
+### Provision 
+Centos7 - Ansible
+
   
 
